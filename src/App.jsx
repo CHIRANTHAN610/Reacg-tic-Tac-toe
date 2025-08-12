@@ -19,11 +19,15 @@ function detiveActivePlayer(gameTurns){
 }
 
 function App() {
+  const[player,setPlayer]=useState({
+    X:'Player 1',
+    Y:'Player 2',
+  });
   const [gameTurns,setGameTurns]=useState([]);
   // const [hasWinner,setHaswinnet]=useState(false);
   // const[activePlayer,setActivePlayer]=useState('X');
 const activePlayer=detiveActivePlayer(gameTurns);
-  let gameBoard=initialGameBoard;
+  let gameBoard=[...initialGameBoard.map(array=>[...array])];
 
     for(const turn of gameTurns){
         const {square,player}=turn;
@@ -37,7 +41,7 @@ for(const combination of WINNING_COMBINATIONS){
   const thirdSquareSymbol=gameBoard[combination[2].row][combination[2].column];
 
   if(firstSquareSymbol && firstSquareSymbol===secondSquareSymbol && firstSquareSymbol===thirdSquareSymbol){
-winner=firstSquareSymbol;
+winner=player[firstSquareSymbol];
   }
 }
 const hasDraw=gameTurns.length===9 && !winner;
@@ -53,15 +57,27 @@ const hasDraw=gameTurns.length===9 && !winner;
       return updatedTurns;
     });
   }
+  function handleRestart(){
+    setGameTurns([]);
+  }
+  function handlePlayerNameChange(symbol,newNAme){
+    setPlayer(prevPlayer=>{
+      return{
+        ...prevPlayer,
+        [symbol]:newNAme
+      };
+
+    });
+  }
  return(
   <main>
     <div id="game-container">
       <ol id="players" className="highlight-player">
-       <Player initialName="Player 1" symbol="X" isActive={activePlayer==='X'} />
-       <Player initialName="Player 2" symbol="O" isActive={activePlayer==='O'} />
+       <Player initialName="Player 1" symbol="X" isActive={activePlayer==='X'} onChangeName={handlePlayerNameChange}/>
+       <Player initialName="Player 2" symbol="O" isActive={activePlayer==='O'} onChangeName={handlePlayerNameChange} />
       </ol>
-      {(winner||hasDraw) && <GameOver winner={winner}/>}
-      <GameBoard onSelectSquare={handleSelectSquare} board={gameBoard}/>
+      {(winner||hasDraw) && <GameOver winner={winner} onRestart={handleRestart}/>}
+      <GameBoard onSelectSquare={handleSelectSquare} board={gameBoard} />
     </div>
     <Log turns={gameTurns}/>
   </main>
